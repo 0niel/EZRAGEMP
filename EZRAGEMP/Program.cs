@@ -17,10 +17,10 @@ namespace EZRAGEMP
         static void Main(string[] args)
         {
             var program = new Program();
-            program.openGame();
+            program.OpenGame();
             Console.ReadKey();
         }
-        private void openGame()
+        private void OpenGame()
         {
             Console.WriteLine("RageMP teleporter by Oniel special for EZcheats.RU!");
             Process TargetProcess = Process.GetProcessesByName("GTA5")[0];
