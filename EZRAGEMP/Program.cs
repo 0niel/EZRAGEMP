@@ -39,14 +39,13 @@ namespace EZRAGEMP
 
                 float fPlayerX = MemLib.ReadFloat(sHEX(dwWorld) + ",0x8,0x30,0x50");
                 float fPlayerY = MemLib.ReadFloat(sHEX(dwWorld) + ",0x8,0x30,0x54");
+                /*
                 float fPlayerZ = MemLib.ReadFloat(sHEX(dwWorld) + ",0x8,0x30,0x58");
 
                 float fVehicleX = MemLib.ReadFloat(sHEX(dwWorld) + ",0x8,0xD28,0x30,0x50");
                 float fVehicleY = MemLib.ReadFloat(sHEX(dwWorld) + ",0x8,0xD28,0x30,0x54");
                 float fVehicleZ = MemLib.ReadFloat(sHEX(dwWorld) + ",0x8,0xD28,0x30,0x58");
-
-                //Console.WriteLine(fVehicleZ);
-
+                */
                 float fBlipX = fPlayerX; 
                 float fBlipY = fPlayerY;
 
@@ -54,39 +53,39 @@ namespace EZRAGEMP
                 {
                     byte[] f3 = BitConverter.GetBytes(Proc.GetAsyncKeyState(0x72));
                     byte[] f4 = BitConverter.GetBytes(Proc.GetAsyncKeyState(0x73));
+                    //byte[] f5 = BitConverter.GetBytes(Proc.GetAsyncKeyState(0x74));
                     if (f3[0] == 1)
                     {
-                        for (int i = 2000; i != 1; i--)
+                        for (int i = 0; i < 2000; i++)
                         {
                             var n = MemLib.ReadLong(string.Format("0x{0:X}", dwBlip + (ulong)(i * 8)));
                             if (n > 0 && MemLib.ReadInt(string.Format("0x{0:X}", n + 0x40)) == 8 && MemLib.ReadInt(string.Format("0x{0:X}", n + 0x48)) == 84)
                             {
                                 fBlipX = MemLib.ReadFloat(string.Format("0x{0:X}", n + 0x10));
                                 fBlipY = MemLib.ReadFloat(string.Format("0x{0:X}", n + 0x14));
+
                                 Console.WriteLine("Teleported to " + fBlipX + ";" + fBlipY);
                                 
-                                var t1 = MemLib.ReadLong(string.Format("0x{0:X}", dwWorld)) + 8;
+                                var t1 = MemLib.ReadLong(string.Format("0x{0:X}", dwWorld)) + 0x8;
                                 var pointer = MemLib.ReadLong(string.Format("0x{0:X}", t1));
 
-                                if(MemLib.ReadInt(string.Format("0x{0:X}", pointer + 0x1468)) == 2)
+                                if (fBlipX != 0.0 && fBlipY != 0.0)
                                 {
-                                    pointer = MemLib.ReadLong(string.Format("0x{0:X}", pointer + 0xD28)); //readPointer(p + 0xD28)
+                                    MemLib.WriteMemory(sHEX(dwWorld) + ",0x8,0x30,0x50", "float", fBlipX.ToString());
+                                    MemLib.WriteMemory(sHEX(dwWorld) + ",0x8,0x30,0x54", "float", fBlipY.ToString());
+                                    MemLib.WriteMemory(sHEX(dwWorld) + ",0x8,0x30,0x58", "float", "-200");
+                                
+                                    MemLib.WriteMemory(string.Format("0x{0:X}", pointer) + "+0x90", "float", fBlipX.ToString());
+                                    MemLib.WriteMemory(string.Format("0x{0:X}", pointer) + "+0x94", "float", fBlipY.ToString());
+                                    MemLib.WriteMemory(string.Format("0x{0:X}", pointer) + "+0x98", "float", "-200");
                                 }
-
-                                MemLib.WriteMemory(sHEX(dwWorld) + ",0x8,0x30,0x50", "float", fBlipX.ToString());
-                                MemLib.WriteMemory(sHEX(dwWorld) + ",0x8,0x30,0x54", "float", fBlipY.ToString());
-                                MemLib.WriteMemory(sHEX(dwWorld) + ",0x8,0x30,0x58", "float", "-250");
-
-                                MemLib.WriteMemory(string.Format("0x{0:X}", pointer) + "+0x90", "float", fBlipX.ToString());
-                                MemLib.WriteMemory(string.Format("0x{0:X}", pointer) + "+0x94", "float", fBlipY.ToString());
-                                MemLib.WriteMemory(string.Format("0x{0:X}", pointer) + "+0x98", "float", "-250");
                             }
                         }
                         Console.Beep();
                     }
                     if (f4[0] == 1)
                     {
-                        for (int i = 2000; i != 1; i--)
+                        for (int i = 0; i < 2000; i++)
                         {
                             var n = MemLib.ReadLong(string.Format("0x{0:X}", dwBlip + (ulong)(i * 8)));
                             if (n > 0 && MemLib.ReadInt(string.Format("0x{0:X}", n + 0x40)) == 8 && MemLib.ReadInt(string.Format("0x{0:X}", n + 0x48)) == 84)
@@ -97,13 +96,34 @@ namespace EZRAGEMP
                                 Console.WriteLine("Teleported to " + fBlipX + ";" + fBlipY);
 
                                 // set vehicle position
-                                MemLib.WriteMemory(sHEX(dwWorld) + ",0x8,0xD28,0x30,0x50", "float", fBlipX.ToString());
-                                MemLib.WriteMemory(sHEX(dwWorld) + ",0x8,0xD28,0x30,0x54", "float", fBlipY.ToString());
-                                MemLib.WriteMemory(sHEX(dwWorld) + ",0x8,0xD28,0x30,0x58", "float", "-250");
+                                if (fBlipX != 0.0 && fBlipY != 0.0)
+                                {
+                                    MemLib.WriteMemory(sHEX(dwWorld) + ",0x8,0xD28,0x30,0x50", "float", fBlipX.ToString());
+                                    MemLib.WriteMemory(sHEX(dwWorld) + ",0x8,0xD28,0x30,0x54", "float", fBlipY.ToString());
+                                    MemLib.WriteMemory(sHEX(dwWorld) + ",0x8,0xD28,0x30,0x58", "float", "-200");
+                                }
                             }
                         }
                         Console.Beep();
                     }
+                    // Custom teleport
+                    /*
+                    if (f5[0] == 1)
+                    {
+                        var t1 = MemLib.ReadLong(string.Format("0x{0:X}", dwWorld)) + 0x8;
+                        var pointer = MemLib.ReadLong(string.Format("0x{0:X}", t1));
+
+                        MemLib.WriteMemory(sHEX(dwWorld) + ",0x8,0x30,0x50", "float", "10");
+                        MemLib.WriteMemory(sHEX(dwWorld) + ",0x8,0x30,0x54", "float", "10");
+                        MemLib.WriteMemory(sHEX(dwWorld) + ",0x8,0x30,0x58", "float", "-200");
+
+                        MemLib.WriteMemory(string.Format("0x{0:X}", pointer) + "+0x90", "float", "10");
+                        MemLib.WriteMemory(string.Format("0x{0:X}", pointer) + "+0x94", "float", "10");
+                        MemLib.WriteMemory(string.Format("0x{0:X}", pointer) + "+0x98", "float", "-200");
+                        
+                        Console.Beep();
+                    }
+                    */
                     Thread.Sleep(1);
                 }
             }
